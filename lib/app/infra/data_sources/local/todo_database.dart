@@ -5,7 +5,15 @@ import 'package:clean_arch_app/app/shared/db_helper.dart';
 import 'package:clean_arch_app/app/shared/failures.dart';
 import 'package:clean_arch_app/app/shared/result.dart';
 
-class TodoDatabase {
+abstract interface class TodoDatabaseInterface {
+  Future<Result<TodoEntity>> insertTodo(TodoEntity todo);
+  Future<Result<TodoEntity>> deleteTodo(TodoEntity todo);
+  Future<Result<List<TodoEntity>>> getAllTodos();
+  Future<Result<TodoEntity>> updateTodo(TodoEntity todo);
+}
+
+class TodoDatabaseSqfliteImplementation implements TodoDatabaseInterface {
+  @override
   Future<Result<TodoEntity>> insertTodo(TodoEntity todo) async {
     final database = await DbHelper.db;
     try {
@@ -22,6 +30,7 @@ class TodoDatabase {
     }
   }
 
+  @override
   Future<Result<TodoEntity>> deleteTodo(TodoEntity todo) async {
     final database = await DbHelper.db;
 
@@ -33,6 +42,7 @@ class TodoDatabase {
     }
   }
 
+  @override
   Future<Result<List<TodoEntity>>> getAllTodos() async {
     final database = await DbHelper.db;
 
@@ -48,6 +58,7 @@ class TodoDatabase {
     }
   }
 
+  @override
   Future<Result<TodoEntity>> updateTodo(TodoEntity todo) async {
     final database = await DbHelper.db;
 
