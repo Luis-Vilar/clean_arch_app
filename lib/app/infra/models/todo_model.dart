@@ -29,11 +29,11 @@ final class TodoModel extends TodoEntity {
     'completed': completed ? 1 : 0,
   };
 
-  TodoEntity toEntity() => TodoEntity(
-    id: id,
-    title: title,
-    todo: todo,
-    createdAt: createdAt,
-    completed: completed,
+  factory TodoModel.fromEntity(TodoEntity entity) => TodoModel(
+    id: entity.id,
+    title: entity.title,
+    todo: entity.todo,
+    createdAt: entity.createdAt,
+    completed: entity.completed,
   );
 }
