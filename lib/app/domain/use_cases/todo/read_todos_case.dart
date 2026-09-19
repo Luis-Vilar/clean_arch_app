@@ -1,11 +1,13 @@
 import 'package:clean_arch_app/app/domain/entities/todo_entity.dart';
 import 'package:clean_arch_app/app/domain/interfaces/todo_repository_interface.dart';
+import 'package:clean_arch_app/app/domain/use_cases/use_case.dart';
 import 'package:clean_arch_app/app/utils/result.dart';
 import 'package:clean_arch_app/core/injection.dart';
 
-class ReadTodosCase {
+class ReadTodosCase extends UseCase<List<TodoEntity>, NoParams> {
   final repository = injection.get<TodoRepositoryInterface>();
 
-  Future<Result<List<TodoEntity>>> readTodos() async =>
+  @override
+  Future<Result<List<TodoEntity>>> call(NoParams params) async =>
       await repository.readAllTodos();
 }
