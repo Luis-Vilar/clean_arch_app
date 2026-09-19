@@ -40,7 +40,7 @@ class TodoDatabase {
       final rows = await database.query('todos');
 
       List<TodoEntity> todos = rows
-          .map((todo) => TodoModel.fromMap(todo).toEntity())
+          .map((todo) => TodoModel.fromMap(todo))
           .toList();
       return Result.ok(todos);
     } catch (error) {
