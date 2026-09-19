@@ -18,7 +18,7 @@ class TodoDatabase {
       });
       return Result.ok(todo);
     } catch (error) {
-      return Result.error(SqfliteFailure(message: error.toString()));
+      return Result.error(SqfliteFailure());
     }
   }
 
@@ -29,7 +29,7 @@ class TodoDatabase {
       await database.delete('todos', where: 'id = ?', whereArgs: [todo.id]);
       return Result.ok(todo);
     } catch (error) {
-      return Result.error(SqfliteFailure(message: error.toString()));
+      return Result.error(SqfliteFailure());
     }
   }
 
@@ -44,7 +44,7 @@ class TodoDatabase {
           .toList();
       return Result.ok(todos);
     } catch (error) {
-      return Result.error(SqfliteFailure(message: error.toString()));
+      return Result.error(SqfliteFailure());
     }
   }
 
@@ -60,7 +60,7 @@ class TodoDatabase {
       );
       return Result.ok(todo);
     } catch (error) {
-      return Result.error(SqfliteFailure(message: error.toString()));
+      return Result.error(SqfliteFailure());
     }
   }
 }
