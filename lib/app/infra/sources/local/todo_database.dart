@@ -2,8 +2,8 @@
 import 'package:clean_arch_app/app/domain/entities/todo_entity.dart';
 import 'package:clean_arch_app/app/infra/models/todo_model.dart';
 import 'package:clean_arch_app/app/infra/utils/db_helper.dart';
-import 'package:clean_arch_app/app/utils/failures.dart';
-import 'package:clean_arch_app/app/utils/result.dart';
+import 'package:clean_arch_app/app/shared/failures.dart';
+import 'package:clean_arch_app/app/shared/result.dart';
 
 class TodoDatabase {
   Future<Result<TodoEntity>> insertTodo(TodoEntity todo) async {
