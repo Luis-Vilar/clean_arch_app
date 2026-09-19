@@ -2,9 +2,10 @@ import 'package:clean_arch_app/app/domain/entities/todo_entity.dart';
 import 'package:clean_arch_app/app/domain/interfaces/todo_repository_interface.dart';
 import 'package:clean_arch_app/app/infra/data_sources/local/todo_database.dart';
 import 'package:clean_arch_app/app/shared/result.dart';
+import 'package:clean_arch_app/core/injection.dart';
 
 class TodoRepository implements TodoRepositoryInterface {
-  final _db = TodoDatabase();
+  final _db = injection.get<TodoDatabaseInterface>();
 
   @override
   Future<Result<TodoEntity>> createTodo(TodoEntity todo) {
