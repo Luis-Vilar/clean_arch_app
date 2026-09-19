@@ -1,4 +1,4 @@
-class TodoEntity {
+abstract class TodoEntity {
   int id;
   String title;
   String todo;
