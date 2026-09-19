@@ -1,11 +1,13 @@
 import 'package:clean_arch_app/app/domain/entities/todo_entity.dart';
 import 'package:clean_arch_app/app/domain/interfaces/todo_repository_interface.dart';
-import 'package:clean_arch_app/app/utils/result.dart';
+import 'package:clean_arch_app/app/shared/use_case.dart';
+import 'package:clean_arch_app/app/shared/result.dart';
 import 'package:clean_arch_app/core/injection.dart';
 
-class UpdateTodoCase {
+class UpdateTodoCase extends UseCase<TodoEntity, TodoEntity> {
   final repository = injection.get<TodoRepositoryInterface>();
 
-  Future<Result<TodoEntity>> updateTodo(TodoEntity todo) async =>
-      await repository.updateTodo(todo);
+  @override
+  Future<Result<TodoEntity>> call(TodoEntity params) async =>
+      await repository.updateTodo(params);
 }

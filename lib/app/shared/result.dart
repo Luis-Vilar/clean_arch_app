@@ -1,4 +1,4 @@
-import 'package:clean_arch_app/app/utils/failures.dart';
+import 'package:clean_arch_app/app/shared/failures.dart';
 
 sealed class Result<T> {
   const Result();
