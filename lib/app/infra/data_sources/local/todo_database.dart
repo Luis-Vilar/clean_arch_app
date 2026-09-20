@@ -6,6 +6,7 @@ import 'package:clean_arch_app/app/infra/models/todo_model.dart';
 import 'package:clean_arch_app/app/shared/db_helper.dart';
 import 'package:clean_arch_app/app/shared/failures.dart';
 import 'package:clean_arch_app/app/shared/result.dart';
+import 'package:sqflite/sql.dart';
 
 abstract interface class TodoDatabaseInterface {
   Future<Result<TodoEntity>> insertTodo(TodoEntity todo);
@@ -26,7 +27,7 @@ class TodoDatabaseSqfliteImplementation implements TodoDatabaseInterface {
         'todo': todo.todo,
         'completed': todo.completed ? 1 : 0,
         'userId': todo.userId,
-      });
+      }, conflictAlgorithm: ConflictAlgorithm.ignore);
       return Result.ok(todo);
     } catch (error) {
       log(error.toString());
