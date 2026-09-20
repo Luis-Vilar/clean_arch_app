@@ -1,0 +1,75 @@
+import 'package:clean_arch_app/app/presenter/components/input_password_component.dart';
+import 'package:clean_arch_app/app/presenter/components/input_user_component.dart';
+import 'package:clean_arch_app/app/presenter/components/login_button_component.dart';
+import 'package:flutter/material.dart';
+
+class LoginFormComponent extends StatelessWidget {
+  const new({
+    super.key,
+    required this.formKey,
+    required this.userController,
+    required this.passwordController,
+  });
+
+  final GlobalKey<FormState> formKey;
+  final TextEditingController userController;
+  final TextEditingController passwordController;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 30.0),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 500),
+                  child: Form(
+                    key: formKey,
+                    child: Column(
+                      crossAxisAlignment: .stretch,
+                      children: [
+                        Image.asset(
+                          'assets/images/logo.png',
+                          width: 260,
+                          height: 260,
+                          fit: .contain,
+                        ),
+                        Text(
+                          'Bem-vindo de volta!',
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        Text(
+                          'Organize suas tarefas e conquiste o seu dia.',
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                        const SizedBox(height: 20),
+                        InputUserComponent(userController: userController),
+                        const SizedBox(height: 20),
+                        InputPasswordComponent(
+                          passwordController: passwordController,
+                        ),
+                        const SizedBox(height: 20),
+                        LoginButtonComponent(
+                          formKey: formKey,
+                          usernameController: userController,
+                          passwordController: passwordController,
+                        ),
+                        const SizedBox(height: 20),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}

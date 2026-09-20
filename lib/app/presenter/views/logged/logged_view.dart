@@ -1,0 +1,217 @@
+import 'package:clean_arch_app/app/domain/entities/todo_entity.dart';
+import 'package:clean_arch_app/app/domain/entities/user_entity.dart';
+import 'package:clean_arch_app/app/presenter/components/add_todo_dialog_component.dart';
+import 'package:clean_arch_app/app/presenter/components/confirm_dialog.dart';
+import 'package:clean_arch_app/app/presenter/components/list_card_component.dart';
+import 'package:clean_arch_app/app/presenter/components/todo_filter_toolbar_component.dart';
+import 'package:clean_arch_app/app/presenter/view_models/bloc/todos_bloc.dart';
+import 'package:clean_arch_app/app/presenter/views/splash/splash_view.dart';
+import 'package:clean_arch_app/app/shared/enums.dart';
+import 'package:clean_arch_app/core/routes.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+class LoggedView extends StatefulWidget {
+  const new({super.key});
+
+  @override
+  State<LoggedView> createState() => _LoggedViewState();
+}
+
+class _LoggedViewState extends State<LoggedView> {
+  bool tryAgain = false;
+  TodoFilter _filter = TodoFilter.all;
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  List<TodoEntity> _filterTodos(List<TodoEntity> todos) {
+    final searchText = _searchController.text.trim().toLowerCase();
+
+    return todos.where((todo) {
+      final matchesStatus = switch (_filter) {
+        TodoFilter.all => true,
+        TodoFilter.pending => !todo.completed,
+        TodoFilter.completed => todo.completed,
+      };
+      final matchesText = todo.todo.toLowerCase().contains(searchText);
+
+      return matchesStatus && matchesText;
+    }).toList();
+  }
+
+  void _showLogoutDialog() => confirmDialog(
+    context: context,
+    action: () async {
+      //await removeSessionData();
+      if (mounted) {
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          AppRoutes.login,
+          (_) => false,
+        );
+      }
+    },
+    titleText: 'Fechar sessão',
+    contentText: 'Tem certeza que deseja fechar a sessão atual?',
+    notConfirmButtonText: 'Cancelar',
+    confirmButtonText: 'Sair',
+  );
+
+  Future<void> _showAddTodoDialog(BuildContext blocContext, int userId) async {
+    final todoText = await showDialog<String>(
+      context: context,
+      builder: (_) => const AddTodoDialogComponent(),
+    );
+
+    if (todoText == null || todoText.isEmpty || !blocContext.mounted) return;
+
+    blocContext.read<TodosBloc>().add(
+      TodosCreateEvent(
+        todo: TodoEntity(
+          id: DateTime.now().millisecondsSinceEpoch,
+          todo: todoText,
+          completed: false,
+          userId: userId,
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final user = ModalRoute.of(context)!.settings.arguments as UserLoggedEntity;
+
+    return BlocProvider<TodosBloc>(
+      create: (_) => TodosBloc()..add(TodosSyncEvent(user: user)),
+      child: Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          leading: Padding(
+            padding: const EdgeInsets.only(left: 24),
+            child: CircleAvatar(
+              backgroundImage: NetworkImage(user.image),
+              onBackgroundImageError: (_, _) {},
+              child: user.image.isEmpty ? const Icon(Icons.person) : null,
+            ),
+          ),
+          title: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '${user.firstName} ${user.lastName}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+              ),
+              Text(
+                user.email,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).appBarTheme.toolbarTextStyle,
+              ),
+            ],
+          ),
+          actions: [
+            IconButton(
+              onPressed: _showLogoutDialog,
+              icon: const Icon(Icons.logout),
+              tooltip: 'Logout',
+              padding: const EdgeInsets.only(right: 24),
+            ),
+          ],
+        ),
+        body: BlocConsumer<TodosBloc, TodosState>(
+          listener: (context, state) {
+            if (state is TodosError) {
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(SnackBar(content: Text(state.message)));
+              setState(() {
+                tryAgain = true;
+              });
+            }
+
+            if (state is TodosSuccess) {
+              setState(() {
+                tryAgain = false;
+              });
+            }
+          },
+          builder: (context, state) {
+            return switch (state) {
+              TodosLoading() => const Center(child: SplashView()),
+              TodosSuccess(:final todos) => _buildTodosContent(context, todos),
+              TodosError(:final message) => Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(36),
+                  child: Text(message),
+                ),
+              ),
+              TodosInitial() => const SizedBox.shrink(),
+            };
+          },
+        ),
+        floatingActionButton: Builder(
+          builder: (blocContext) => tryAgain
+              ? FloatingActionButton(
+                  backgroundColor: Colors.amber,
+                  foregroundColor: Colors.blueAccent,
+                  onPressed: () => blocContext.read<TodosBloc>().add(
+                    TodosSyncEvent(user: user),
+                  ),
+                  tooltip: 'Recarregar',
+                  child: const Icon(Icons.replay),
+                )
+              : FloatingActionButton(
+                  onPressed: () => _showAddTodoDialog(blocContext, user.id),
+                  tooltip: 'Adicionar tarefa',
+                  child: const Icon(Icons.add),
+                ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTodosContent(BuildContext context, List<TodoEntity> todos) {
+    final filteredTodos = _filterTodos(todos);
+
+    return Column(
+      children: [
+        TodoFilterToolbarComponent(
+          searchController: _searchController,
+          selectedFilter: _filter,
+          onSearchChanged: (_) => setState(() {}),
+          onClearSearch: () {
+            _searchController.clear();
+            setState(() {});
+          },
+          onFilterChanged: (filter) {
+            setState(() {
+              _filter = filter;
+            });
+          },
+        ),
+        Expanded(
+          child: filteredTodos.isEmpty
+              ? const Center(child: Text('Sem tarefas para este filtro.'))
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: filteredTodos.length,
+                  itemBuilder: (context, index) {
+                    final todo = filteredTodos[index];
+                    return ListCardComponent(
+                      todo: todo,
+                      listViewContext: context,
+                    );
+                  },
+                ),
+        ),
+      ],
+    );
+  }
+}
