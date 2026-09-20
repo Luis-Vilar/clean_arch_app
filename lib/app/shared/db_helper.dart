@@ -31,10 +31,9 @@ class DbHelper {
         await db.execute('''
 CREATE TABLE IF NOT EXISTS todos (
   id INTEGER PRIMARY KEY,
-  title TEXT,
   todo TEXT,
-  createdAt TEXT,
-  completed INTEGER NOT NULL DEFAULT 0 CHECK (completed IN (0, 1))
+  completed INTEGER NOT NULL DEFAULT 0 CHECK (completed IN (0, 1)),
+  userId INTEGER
 );
 ''');
       },

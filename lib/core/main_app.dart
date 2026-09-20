@@ -1,4 +1,6 @@
-import 'package:clean_arch_app/app/presenter/views/about/about_page.dart';
+import 'package:clean_arch_app/core/dark_theme.dart';
+import 'package:clean_arch_app/core/light_theme.dart';
+import 'package:clean_arch_app/core/routes.dart';
 import 'package:flutter/material.dart';
 
 class MainApp extends StatelessWidget {
@@ -6,6 +8,13 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(home: AboutPage());
+    return MaterialApp(
+      routes: AppRoutes.routes,
+      initialRoute: AppRoutes.login,
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      themeMode: ThemeMode.system,
+      debugShowCheckedModeBanner: false,
+    );
   }
 }
