@@ -23,7 +23,5 @@ void initDependencyInjection() {
   );
   injection.registerFactory<AuthInterface>(() => AuthSource());
   injection.registerFactory<TodoSourceInterface>(() => TodoSource());
-  injection.registerFactory<SharedPrefInterface>(
-    () => SharedPrefImplementation(),
-  );
+  injection.registerFactory<SharedPrefInterface>(() => SharedPref());
 }

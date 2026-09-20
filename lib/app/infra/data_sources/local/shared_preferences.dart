@@ -7,7 +7,7 @@ import 'package:clean_arch_app/app/shared/failures.dart';
 import 'package:clean_arch_app/app/shared/result.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SharedPrefImplementation implements SharedPrefInterface {
+class SharedPref implements SharedPrefInterface {
   static String sessionDataKey = 'sessionData';
 
   @override
