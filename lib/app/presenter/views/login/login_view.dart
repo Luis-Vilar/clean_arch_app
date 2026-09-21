@@ -27,7 +27,7 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider<LoginBloc>(
-      create: (_) => LoginBloc()..add(CheckSessionEvent()),
+      create: (_) => LoginBloc()..add(LoginCheckSessionEvent()),
       child: Scaffold(
         body: BlocConsumer<LoginBloc, LoginState>(
           listener: (context, state) {

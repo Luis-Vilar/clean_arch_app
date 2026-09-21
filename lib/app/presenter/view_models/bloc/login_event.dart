@@ -3,11 +3,11 @@ part of 'login_bloc.dart';
 
 sealed class LoginEvent {}
 
-class CheckSessionEvent extends LoginEvent {}
+class LoginCheckSessionEvent extends LoginEvent {}
 
 class LoginUserEvent extends LoginEvent {
   UserLoginEntity user;
   LoginUserEvent({required this.user});
 }
 
-class ClearSessionDataEvent extends LoginEvent {}
+class LogoutUserEvent extends LoginEvent {}

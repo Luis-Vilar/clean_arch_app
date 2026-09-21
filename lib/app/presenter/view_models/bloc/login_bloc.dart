@@ -15,11 +15,11 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   final _logoutUser = LogoutUserCase();
 
   LoginBloc() : super(LoginInitial()) {
-    on<ClearSessionDataEvent>((event, emit) {
+    on<LogoutUserEvent>((event, emit) {
       _logoutUser(NoParams());
     });
 
-    on<CheckSessionEvent>((event, emit) async {
+    on<LoginCheckSessionEvent>((event, emit) async {
       emit(LoginLoading());
 
       final result = await _checkSession(NoParams());

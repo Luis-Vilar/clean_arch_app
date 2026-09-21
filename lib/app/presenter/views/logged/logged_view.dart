@@ -50,7 +50,7 @@ class _LoggedViewState extends State<LoggedView> {
     action: () async {
       //todo removeSessionData();
       if (providerContext.mounted) {
-        providerContext.read<LoginBloc>().add(ClearSessionDataEvent());
+        providerContext.read<LoginBloc>().add(LogoutUserEvent());
         Navigator.pushNamedAndRemoveUntil(
           providerContext,
           AppRoutes.login,
