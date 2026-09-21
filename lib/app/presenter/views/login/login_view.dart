@@ -45,12 +45,12 @@ class _LoginViewState extends State<LoginView> {
           },
           builder: (context, state) {
             return switch (state) {
-              LoginLoading() => const SplashView(),
-              _ => LoginFormComponent(
+              LoginError() => LoginFormComponent(
                 formKey: formKey,
                 userController: userController,
                 passwordController: passwordController,
               ),
+              _ => const SplashView(),
             };
           },
         ),
