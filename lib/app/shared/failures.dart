@@ -21,15 +21,51 @@ final class DioDefaultFailure implements Failure {
       'Problemas com o cliente HTTP, tente novamente mais tarde.';
 }
 
+final class DioBadCertificateFailure implements Failure {
+  @override
+  String get message => 'O certificado do servidor é inválido.';
+}
+
+final class DioBadResponseFailure implements Failure {
+  @override
+  String get message =>
+      'A resposta da API não foi recebida corretamente, verifique suas credenciais.';
+}
+
 final class DioConnectionErrorFailure implements Failure {
   @override
-  String get message => 'Sem internet?. Verifica a conexão e tenta novamente';
+  String get message => 'Sem internet? Verifique a conexão e tente novamente.';
 }
 
 final class DioConnectionTimeoutFailure implements Failure {
   @override
   String get message =>
-      'Demorando para receber a resposta da API, verifique o sinal de internet';
+      'Demorando para receber a resposta da API, verifique o sinal de internet.';
+}
+
+final class DioCancelFailure implements Failure {
+  @override
+  String get message => 'A requisição foi cancelada.';
+}
+
+final class DioReceiveTimeoutFailure implements Failure {
+  @override
+  String get message => 'Tempo limite ao receber a resposta da API.';
+}
+
+final class DioSendTimeoutFailure implements Failure {
+  @override
+  String get message => 'Tempo limite ao enviar a requisição.';
+}
+
+final class DioTransformTimeoutFailure implements Failure {
+  @override
+  String get message => 'Tempo limite durante a transformação dos dados.';
+}
+
+final class DioUnknownFailure implements Failure {
+  @override
+  String get message => 'Erro desconhecido ao comunicar com a API.';
 }
 
 final class TodoSourceDefaultFailure implements Failure {
