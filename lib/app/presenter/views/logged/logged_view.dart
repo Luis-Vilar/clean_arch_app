@@ -4,6 +4,7 @@ import 'package:clean_arch_app/app/presenter/components/add_todo_dialog_componen
 import 'package:clean_arch_app/app/presenter/components/confirm_dialog.dart';
 import 'package:clean_arch_app/app/presenter/components/list_card_component.dart';
 import 'package:clean_arch_app/app/presenter/components/todo_filter_toolbar_component.dart';
+import 'package:clean_arch_app/app/presenter/view_models/bloc/login_bloc.dart';
 import 'package:clean_arch_app/app/presenter/view_models/bloc/todos_bloc.dart';
 import 'package:clean_arch_app/app/presenter/views/splash/splash_view.dart';
 import 'package:clean_arch_app/app/shared/enums.dart';
@@ -44,13 +45,14 @@ class _LoggedViewState extends State<LoggedView> {
     }).toList();
   }
 
-  void _showLogoutDialog() => confirmDialog(
-    context: context,
+  void _showLogoutDialog(BuildContext providerContext) => confirmDialog(
+    context: providerContext,
     action: () async {
-      //await removeSessionData();
-      if (mounted) {
+      //todo removeSessionData();
+      if (providerContext.mounted) {
+        providerContext.read<LoginBloc>().add(ClearSessionDataEvent());
         Navigator.pushNamedAndRemoveUntil(
-          context,
+          providerContext,
           AppRoutes.login,
           (_) => false,
         );
@@ -86,92 +88,102 @@ class _LoggedViewState extends State<LoggedView> {
   Widget build(BuildContext context) {
     final user = ModalRoute.of(context)!.settings.arguments as UserLoggedEntity;
 
-    return BlocProvider<TodosBloc>(
-      create: (_) => TodosBloc()..add(TodosSyncEvent(user: user)),
-      child: Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          leading: Padding(
-            padding: const EdgeInsets.only(left: 24),
-            child: CircleAvatar(
-              backgroundImage: NetworkImage(user.image),
-              onBackgroundImageError: (_, _) {},
-              child: user.image.isEmpty ? const Icon(Icons.person) : null,
-            ),
-          ),
-          title: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                '${user.firstName} ${user.lastName}',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<TodosBloc>(
+          create: (_) => TodosBloc()..add(TodosSyncEvent(user: user)),
+        ),
+        BlocProvider<LoginBloc>(create: (_) => LoginBloc()),
+      ],
+      child: Builder(
+        builder: (providerContext) => Scaffold(
+          appBar: AppBar(
+            centerTitle: true,
+            leading: Padding(
+              padding: const EdgeInsets.only(left: 24),
+              child: CircleAvatar(
+                backgroundImage: NetworkImage(user.image),
+                onBackgroundImageError: (_, _) {},
+                child: user.image.isEmpty ? const Icon(Icons.person) : null,
               ),
-              Text(
-                user.email,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).appBarTheme.toolbarTextStyle,
+            ),
+            title: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '${user.firstName} ${user.lastName}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                ),
+                Text(
+                  user.email,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).appBarTheme.toolbarTextStyle,
+                ),
+              ],
+            ),
+            actions: [
+              IconButton(
+                onPressed: () => _showLogoutDialog(providerContext),
+                icon: const Icon(Icons.logout),
+                tooltip: 'Logout',
+                padding: const EdgeInsets.only(right: 24),
               ),
             ],
           ),
-          actions: [
-            IconButton(
-              onPressed: _showLogoutDialog,
-              icon: const Icon(Icons.logout),
-              tooltip: 'Logout',
-              padding: const EdgeInsets.only(right: 24),
-            ),
-          ],
-        ),
-        body: BlocConsumer<TodosBloc, TodosState>(
-          listener: (context, state) {
-            if (state is TodosError) {
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text(state.message)));
-              setState(() {
-                tryAgain = true;
-              });
-            }
+          body: BlocConsumer<TodosBloc, TodosState>(
+            listener: (context, state) {
+              if (state is TodosError) {
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(SnackBar(content: Text(state.message)));
+                setState(() {
+                  tryAgain = true;
+                });
+              }
 
-            if (state is TodosSuccess) {
-              setState(() {
-                tryAgain = false;
-              });
-            }
-          },
-          builder: (context, state) {
-            return switch (state) {
-              TodosLoading() => const Center(child: SplashView()),
-              TodosSuccess(:final todos) => _buildTodosContent(context, todos),
-              TodosError(:final message) => Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(36),
-                  child: Text(message),
+              if (state is TodosSuccess) {
+                setState(() {
+                  tryAgain = false;
+                });
+              }
+            },
+            builder: (context, state) {
+              return switch (state) {
+                TodosLoading() => const Center(child: SplashView()),
+                TodosSuccess(:final todos) => _buildTodosContent(
+                  context,
+                  todos,
                 ),
-              ),
-              TodosInitial() => const SizedBox.shrink(),
-            };
-          },
-        ),
-        floatingActionButton: Builder(
-          builder: (blocContext) => tryAgain
-              ? FloatingActionButton(
-                  backgroundColor: Colors.amber,
-                  foregroundColor: Colors.blueAccent,
-                  onPressed: () => blocContext.read<TodosBloc>().add(
-                    TodosSyncEvent(user: user),
+                TodosError(:final message) => Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(36),
+                    child: Text(message),
                   ),
-                  tooltip: 'Recarregar',
-                  child: const Icon(Icons.replay),
-                )
-              : FloatingActionButton(
-                  onPressed: () => _showAddTodoDialog(blocContext, user.id),
-                  tooltip: 'Adicionar tarefa',
-                  child: const Icon(Icons.add),
                 ),
+                TodosInitial() => const SizedBox.shrink(),
+              };
+            },
+          ),
+          floatingActionButton: Builder(
+            builder: (blocContext) => tryAgain
+                ? FloatingActionButton(
+                    backgroundColor: Colors.amber,
+                    foregroundColor: Colors.blueAccent,
+                    onPressed: () => blocContext.read<TodosBloc>().add(
+                      TodosSyncEvent(user: user),
+                    ),
+                    tooltip: 'Recarregar',
+                    child: const Icon(Icons.replay),
+                  )
+                : FloatingActionButton(
+                    onPressed: () => _showAddTodoDialog(blocContext, user.id),
+                    tooltip: 'Adicionar tarefa',
+                    child: const Icon(Icons.add),
+                  ),
+          ),
         ),
       ),
     );
