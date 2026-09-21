@@ -42,7 +42,7 @@ final class TodoSourceInvalidFormatFailure implements Failure {
   String get message => 'Formato inválido da API de todos.';
 }
 
-final class SharedPreferencesNoSessionFoundFailure implements Failure {
+final class SharedPreferencesNotSessionFoundFailure implements Failure {
   @override
   String get message => 'Não existe uma sessão salva.';
 }

@@ -33,11 +33,11 @@ class SharedPref implements SharedPrefInterface {
       //! fim da gambiarra...
 
       if (session == null) {
-        return Result.error(SharedPreferencesNoSessionFoundFailure());
+        return Result.error(SharedPreferencesNotSessionFoundFailure());
       }
 
-      final json = jsonDecode(session) as Map<String, dynamic>;
-      final user = UserLoggedModel.fromMap(json).toEntity();
+      final userMap = jsonDecode(session) as Map<String, dynamic>;
+      final user = UserLoggedModel.fromMap(userMap).toEntity();
       return Result.ok(user);
     } catch (error) {
       return Result.error(ExceptionToFailure(message: error.toString()));
