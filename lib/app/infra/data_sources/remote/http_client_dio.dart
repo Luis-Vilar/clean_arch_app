@@ -49,9 +49,15 @@ final class HttpClientDio implements HttpClientInterface {
 
   Failure _toFailure(DioException error) {
     final failure = switch (error.type) {
+      DioExceptionType.badCertificate => DioBadCertificateFailure(),
+      DioExceptionType.badResponse => DioBadResponseFailure(),
       DioExceptionType.connectionError => DioConnectionErrorFailure(),
       DioExceptionType.connectionTimeout => DioConnectionTimeoutFailure(),
-      _ => DioDefaultFailure(),
+      DioExceptionType.cancel => DioCancelFailure(),
+      DioExceptionType.receiveTimeout => DioReceiveTimeoutFailure(),
+      DioExceptionType.sendTimeout => DioSendTimeoutFailure(),
+      DioExceptionType.transformTimeout => DioTransformTimeoutFailure(),
+      DioExceptionType.unknown => DioUnknownFailure(),
     };
 
     return failure;
