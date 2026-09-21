@@ -9,3 +9,5 @@ class LoginUserEvent extends LoginEvent {
   UserLoginEntity user;
   LoginUserEvent({required this.user});
 }
+
+class ClearSessionDataEvent extends LoginEvent {}
