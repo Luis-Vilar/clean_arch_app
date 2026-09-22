@@ -2,18 +2,12 @@
 import 'dart:developer';
 
 import 'package:clean_arch_app/app/domain/entities/todo_entity.dart';
+import 'package:clean_arch_app/app/infra/drivers/todo_database_interface.dart';
 import 'package:clean_arch_app/app/infra/models/todo_model.dart';
 import 'package:clean_arch_app/app/shared/db_helper.dart';
 import 'package:clean_arch_app/app/shared/failures.dart';
 import 'package:clean_arch_app/app/shared/result.dart';
 import 'package:sqflite/sql.dart';
-
-abstract interface class TodoDatabaseInterface {
-  Future<Result<TodoEntity>> insertTodo(TodoEntity todo);
-  Future<Result<TodoEntity>> deleteTodo(TodoEntity todo);
-  Future<Result<List<TodoEntity>>> getAllTodos();
-  Future<Result<TodoEntity>> updateTodo(TodoEntity todo);
-}
 
 class TodoDatabaseSqfliteImplementation implements TodoDatabaseInterface {
   static const String _tableName = 'todos';

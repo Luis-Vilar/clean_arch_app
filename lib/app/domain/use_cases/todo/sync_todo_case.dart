@@ -1,7 +1,7 @@
 import 'package:clean_arch_app/app/domain/entities/todo_entity.dart';
 import 'package:clean_arch_app/app/domain/entities/user_entity.dart';
-import 'package:clean_arch_app/app/domain/interfaces/todo_repository_interface.dart';
-import 'package:clean_arch_app/app/domain/interfaces/todo_source_interface.dart';
+import 'package:clean_arch_app/app/infra/drivers/todo_repository_interface.dart';
+import 'package:clean_arch_app/app/infra/drivers/todo_source_interface.dart';
 import 'package:clean_arch_app/app/infra/models/todo_model.dart';
 import 'package:clean_arch_app/app/shared/failures.dart';
 import 'package:clean_arch_app/app/shared/result.dart';

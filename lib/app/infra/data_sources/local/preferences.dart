@@ -1,13 +1,13 @@
 import 'dart:convert';
 
 import 'package:clean_arch_app/app/domain/entities/user_entity.dart';
-import 'package:clean_arch_app/app/domain/interfaces/shared_preferences_interface.dart';
+import 'package:clean_arch_app/app/infra/drivers/preferences_interface.dart';
 import 'package:clean_arch_app/app/infra/models/user_model.dart';
 import 'package:clean_arch_app/app/shared/failures.dart';
 import 'package:clean_arch_app/app/shared/result.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SharedPref implements SharedPrefInterface {
+class SharedPref implements PreferencesInterface {
   static String sessionDataKey = 'sessionData';
 
   @override
