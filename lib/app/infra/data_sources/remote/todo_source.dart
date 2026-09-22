@@ -1,4 +1,4 @@
-import 'package:clean_arch_app/app/domain/interfaces/http_client.dart';
+import 'package:clean_arch_app/app/infra/drivers/http_client.dart';
 import 'package:clean_arch_app/app/infra/drivers/todo_source_interface.dart';
 import 'package:clean_arch_app/app/infra/models/todo_model.dart';
 import 'package:clean_arch_app/app/shared/failures.dart';
