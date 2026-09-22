@@ -1,35 +1,32 @@
-# Clean Arch App (Notitas)
+# Clean Arch App
 
-Aplicación mobile en Flutter para gestión de tareas, basada en arquitectura limpia (Clean Architecture) con separación clara entre dominio, infraestructura y presentación.
+Aplicación mobile en Flutter para gestionar tareas con una arquitectura basada en Clean Architecture, separando dominio, infraestructura, presentación y utilidades compartidas.
 
 ## Descripción
 
-Este proyecto mantiene la lógica de negocio desacoplada de la capa de UI y de las fuentes de datos, facilitando mantenimiento, pruebas y evolución del sistema. La app permite:
+Esta app permite:
 
 - Iniciar sesión con la API pública de DummyJSON
-- Mantener la sesión del usuario con `SharedPreferences`
-- Consultar y sincronizar tareas
-- Crear, actualizar, eliminar y listar tareas
-- Persistir datos localmente con SQLite
-- Filtrar tareas por estado y texto
-- Gestionar estados con `flutter_bloc`
+- Mantener la sesión activa del usuario con preferencias locales
+- Listar, crear, actualizar, eliminar y sincronizar tareas
+- Persistir los datos localmente con SQLite
+- Gestionar la UI con BLoC
 - Inyectar dependencias con `GetIt`
+- Manejar resultados y errores de forma centralizada con un `Result` pattern
 
 ## Stack tecnológico
 
 - Flutter
 - Dart
-- BLoC / flutter_bloc
+- BLoC / `flutter_bloc`
 - Dio
-- SQLite / sqflite
+- SQLite / `sqflite`
 - SharedPreferences
-- GetIt
+- `GetIt`
 - Clean Architecture
 - Result pattern
 
-## Arquitectura del proyecto
-
-La estructura del proyecto sigue una organización basada en capas:
+## Estructura del proyecto
 
 ```text
 lib/
@@ -48,11 +45,8 @@ lib/
 │   │   │   ├── todo_entity.dart
 │   │   │   └── user_entity.dart
 │   │   ├── interfaces/
-│   │   │   ├── auth.dart
-│   │   │   ├── http_client.dart
-│   │   │   ├── shared_preferences_interface.dart
 │   │   │   ├── todo_repository_interface.dart
-│   │   │   └── todo_source_interface.dart
+│   │   │   └── user_repository_interface.dart
 │   │   └── use_cases/
 │   │       ├── todo/
 │   │       │   ├── create_todo_case.dart
@@ -68,17 +62,24 @@ lib/
 │   ├── infra/
 │   │   ├── data_sources/
 │   │   │   ├── local/
-│   │   │   │   ├── shared_preferences.dart
+│   │   │   │   ├── preferences.dart
 │   │   │   │   └── todo_database.dart
 │   │   │   └── remote/
 │   │   │       ├── auth_source.dart
 │   │   │       ├── http_client_dio.dart
 │   │   │       └── todo_source.dart
+│   │   ├── drivers/
+│   │   │   ├── auth.dart
+│   │   │   ├── http_client.dart
+│   │   │   ├── preferences_interface.dart
+│   │   │   ├── todo_database_interface.dart
+│   │   │   └── todo_source_interface.dart
 │   │   ├── models/
 │   │   │   ├── todo_model.dart
 │   │   │   └── user_model.dart
 │   │   └── repositories/
-│   │       └── todo_repository.dart
+│   │       ├── todo_repository.dart
+│   │       └── user_repository.dart
 │   │
 │   ├── presenter/
 │   │   ├── components/
@@ -115,68 +116,71 @@ lib/
 │       ├── result.dart
 │       └── use_case.dart
 │
-└── assets/
-    └── images/
-        └── logo.png
+├── assets/
+│   └── images/
+│       └── logo.png
+│
+└── generated_plugin_registrant.dart
 ```
 
-## Capas de la aplicación
+## Arquitectura general
 
 ### 1. Dominio
 
-Contiene la lógica pura del negocio y las reglas principales del sistema:
+Contiene las entidades y contratos del negocio:
 
-- Entidades: `TodoEntity`, `UserEntity`
-- Interfaces: contratos para repositorios, autenticación, fuente de datos y cliente HTTP
-- Casos de uso: login, sesión, lectura, creación, actualización y sincronización de TODOs
+- `TodoEntity` y `UserEntity`
+- `TodoRepositoryInterface`
+- `UserRepositoryInterface`
+- Casos de uso de tareas y sesión
 
 ### 2. Infraestructura
 
-Encapsula la implementación de tecnologías externas y adaptadores:
+Implementa adaptadores y dependencias externas:
 
-- Fuentes remotas: `AuthSource`, `TodoSource`, `HttpClientDio`
-- Fuentes locales: `TodoDatabase`, `SharedPreferences`
-- Modelos de datos: conversiones entre JSON y entidades
-- Repositorios: coordinación entre datos remotos y locales
+- `AuthSource`, `TodoSource`, `HttpClientDio`
+- `TodoDatabaseSqfliteImplementation`
+- `SharedPref`
+- `TodoRepository` y `UserRepository`
+- `drivers` como interfaces de compatibilidad para cada dependencia
 
 ### 3. Presentación
 
-Se encarga de la UI y del manejo de estados del usuario:
+Encapsula la capa visual y la lógica de estado:
 
-- Vistas: `SplashView`, `LoginView`, `LoggedView`
-- Componentes reutilizables de formulario, filtros y diálogos
-- BLoCs: `LoginBloc` y `TodosBloc`
+- Vistas: splash, login y logged
+- Componentes reutilizables
+- `LoginBloc` y `TodosBloc`
 
-## Flujo de la aplicación
+## Flujo principal
 
 ```text
-Inicio
-  ↓
 SplashView
   ↓
 Verifica sesión almacenada
-  ├── Sí hay sesión → LoggedView
-  └── No hay sesión → LoginView
+  ├── Sí existe sesión → LoggedView
+  └── No existe sesión → LoginView
              ↓
       Login con DummyJSON
              ↓
-      Guardado de sesión
+      Guardado de sesión local
              ↓
-      Carga de tareas
+      Carga/consulta de todos
              ↓
-      Sincronización local + UI
+      Sincronización con API + SQLite
 ```
 
-## Patrones implementados
+## Patrón de inyección de dependencias
 
-- Clean Architecture
-- Repository pattern
-- Use cases
-- Dependency injection con `GetIt`
-- Result pattern para manejar errores de forma centralizada
-- BLoC para gestión de estado
-- SQLite para persistencia local
-- SharedPreferences para sesión
+La configuración de servicios centraliza las implementaciones en `core/injection.dart` usando `GetIt`:
+
+- `HttpClientInterface`
+- `TodoRepositoryInterface`
+- `TodoDatabaseInterface`
+- `AuthInterface`
+- `UserRepositoryInterface`
+- `TodoSourceInterface`
+- `PreferencesInterface`
 
 ## API utilizada
 
@@ -197,17 +201,14 @@ Contraseña: michaelwpass
 
 ## Funcionalidades principales
 
-- Autenticación con usuario y contraseña
-- Validación de formulario
-- Guardado de sesión persistente
-- Listado de tareas con filtros
-- Búsqueda por texto
-- Creación de nuevas tareas
-- Marcado de tareas como completadas
-- Eliminación local de tareas ya concluidas
-- Sincronización desde la API y persistencia local en SQLite
-- Manejo de errores con mensajes en la UI
-- Botón de reintento cuando falla la carga de tareas
+- Login con credenciales del usuario
+- Guardado persistente de sesión
+- Verificación de sesión activa al iniciar la app
+- Listado, creación, actualización y eliminación de tareas
+- Sincronización de todos desde la API
+- Persistencia local con SQLite
+- Manejo centralizado de errores con `Result`
+- Filtrado y validación de tareas en la UI
 
 ## Requisitos previos
 
@@ -232,9 +233,7 @@ Instala las dependencias:
 flutter pub get
 ```
 
-Ejecuta la app:
-
-- Inicializa el emulador de tu preferencia o conecta tu dispositivo físico en modo dev previamente, luego ejecuta en la terminal :
+Ejecuta la aplicación:
 
 ```bash
 flutter run
@@ -242,10 +241,11 @@ flutter run
 
 ## Observación sobre la arquitectura
 
-Este proyecto nace del refactorizado de Notitas con enfoque en Clean Architecture para separar responsabilidades del negocio, las fuentes de datos y la presentación, manteniendo el uso de BLoC para la gestión de estado en la capa de UI. el proyecto anterior basado en MVVM puede consultarse en <https://github.com/Luis-Vilar/M2S07-Mini-Projeto-Avaliativo>.
+Este proyecto está orientado a una estructura clara de Clean Architecture, separando la lógica de negocio, la infraestructura y la capa de presentación. La intención es mantener la lógica de dominio independiente de la UI y de las implementaciones externas, facilitando mantenimiento, pruebas y evolución del proyecto.
 
 ## Autor
 
-Proyecto desarrollado como parte de una práctica de desarrollo mobile con Flutter, aplicando arquitectura limpia y patrones modernos de diseño.
+Proyecto desarrollado con Flutter y arquitectura limpia para practicar la separación de responsabilidades y el desarrollo de apps con capas bien definidas.
+Este proyecto nace del refactorizado de *Notitas*, baseado en  *MVVM* y puede consultarse en <https://github.com/Luis-Vilar/M2S07-Mini-Projeto-Avaliativo>
 
 ### Luis Vilar
