@@ -15,10 +15,12 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   final _logoutUser = LogoutUserCase();
 
   LoginBloc() : super(LoginInitial()) {
+    //
     on<LogoutUserEvent>((event, emit) {
       _logoutUser(NoParams());
+      emit(LoginInitial());
     });
-
+    //
     on<LoginCheckSessionEvent>((event, emit) async {
       emit(LoginLoading());
 
@@ -34,7 +36,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         return;
       }
     });
-
+    //
     on<LoginUserEvent>((event, emit) async {
       emit(LoginLoading());
 
@@ -49,8 +51,6 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         emit(LoginError(message: result.error.message));
         return;
       }
-
-      emit(LoginError(message: 'No se pudo iniciar sesión.'));
     });
   }
 }

@@ -1,8 +1,8 @@
 import 'dart:developer';
 
 import 'package:clean_arch_app/app/domain/entities/user_entity.dart';
-import 'package:clean_arch_app/app/domain/interfaces/auth.dart';
-import 'package:clean_arch_app/app/domain/interfaces/http_client.dart';
+import 'package:clean_arch_app/app/infra/drivers/auth.dart';
+import 'package:clean_arch_app/app/infra/drivers/http_client.dart';
 import 'package:clean_arch_app/app/shared/failures.dart';
 import 'package:clean_arch_app/app/shared/result.dart';
 import 'package:clean_arch_app/core/injection.dart';
