@@ -1,7 +1,7 @@
 import 'package:clean_arch_app/app/domain/entities/user_entity.dart';
 import 'package:clean_arch_app/app/infra/drivers/auth.dart';
 import 'package:clean_arch_app/app/infra/drivers/preferences_interface.dart';
-import 'package:clean_arch_app/app/infra/drivers/user_repository_interface.dart';
+import 'package:clean_arch_app/app/domain/interfaces/user_repository_interface.dart';
 import 'package:clean_arch_app/app/shared/failures.dart';
 import 'package:clean_arch_app/app/shared/result.dart';
 import 'package:clean_arch_app/core/injection.dart';

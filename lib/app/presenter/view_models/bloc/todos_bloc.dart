@@ -73,8 +73,6 @@ class TodosBloc extends Bloc<TodosEvent, TodosState> {
         emit(TodosSuccess(todos: syncResult.value));
         return;
       }
-
-      emit(TodosError(message: 'No se pudo sincronizar los todos.'));
     });
   }
 

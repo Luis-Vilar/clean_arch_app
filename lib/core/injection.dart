@@ -2,7 +2,7 @@ import 'package:clean_arch_app/app/infra/drivers/auth.dart';
 import 'package:clean_arch_app/app/infra/drivers/http_client.dart';
 import 'package:clean_arch_app/app/infra/drivers/preferences_interface.dart';
 import 'package:clean_arch_app/app/infra/drivers/todo_database_interface.dart';
-import 'package:clean_arch_app/app/infra/drivers/todo_repository_interface.dart';
+import 'package:clean_arch_app/app/domain/interfaces/todo_repository_interface.dart';
 import 'package:clean_arch_app/app/infra/drivers/todo_source_interface.dart';
 import 'package:clean_arch_app/app/infra/data_sources/local/preferences.dart';
 import 'package:clean_arch_app/app/infra/data_sources/local/todo_database.dart';
