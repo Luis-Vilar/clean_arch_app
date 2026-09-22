@@ -1,4 +1,4 @@
-import 'package:clean_arch_app/app/domain/interfaces/auth.dart';
+import 'package:clean_arch_app/app/infra/drivers/auth.dart';
 import 'package:clean_arch_app/app/infra/drivers/http_client.dart';
 import 'package:clean_arch_app/app/infra/drivers/preferences_interface.dart';
 import 'package:clean_arch_app/app/infra/drivers/todo_database_interface.dart';
