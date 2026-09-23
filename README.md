@@ -120,7 +120,7 @@ lib/
 │   └── images/
 │       └── logo.png
 │
-└── generated_plugin_registrant.dart
+└── flutter_launcher_icons.yaml
 ```
 
 ## Arquitectura general
